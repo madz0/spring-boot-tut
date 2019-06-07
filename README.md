@@ -10,8 +10,8 @@ Filters are called before actions and can change request's path. To register a f
 
 ```java
 @Bean
-    public FilterRegistrationBean<LanguageUriFilter> registerLanguageUriFilter(CustomFilter filter) {
-        FilterRegistrationBean<LanguageUriFilter> reg = new FilterRegistrationBean<>(filter);
-        return reg;
-    }
+public FilterRegistrationBean<LanguageUriFilter> registerLanguageUriFilter(CustomFilter filter) {
+    FilterRegistrationBean<LanguageUriFilter> reg = new FilterRegistrationBean<>(filter);
+    return reg;
+}
 ```
