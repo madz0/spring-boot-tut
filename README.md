@@ -8,7 +8,7 @@ This intercepts after calling the action method and intercepts view creation.
 
 Filters are called before actions and can change request's path. To register a filter (Here it is called CustomFilter) we do:
 
-```
+```java
 @Bean
     public FilterRegistrationBean<LanguageUriFilter> registerLanguageUriFilter(CustomFilter filter) {
         FilterRegistrationBean<LanguageUriFilter> reg = new FilterRegistrationBean<>(filter);
