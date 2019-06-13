@@ -58,3 +58,8 @@ For example for wildfly, use `spring-boot-starter-undertow`
 	<!-- … -->
 </dependencies>
 ```
+
+## Content type `application/x-www-form-urlencoded;charset=UTF-8` not supported
+
+Spring `@RequestBody` only works for `application/json` request. Using it for `application/x-www-form-urlencoded`causes above error.
+For `x-www-form-url-encoded` we can use `@RequestParam Map<String, String> body`as the parameter
