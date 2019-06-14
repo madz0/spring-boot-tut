@@ -63,3 +63,37 @@ For example for wildfly, use `spring-boot-starter-undertow`
 
 Spring `@RequestBody` only works for `application/json` request. Using it for `application/x-www-form-urlencoded`causes above error.
 For `x-www-form-url-encoded` we can use `@RequestParam Map<String, String> body`as the parameter
+
+## Effective hot swap templates
+
+From [so](https://stackoverflow.com/questions/40057057/spring-boot-and-thymeleaf-hot-swap-templates-and-resources-once-again)
+
+Do following changes in properites
+
+```
+spring.thymeleaf.cache=false
+spring.thymeleaf.mode=LEGACYHTML5
+#spring.thymeleaf.prefix=/templates/
+spring.thymeleaf.templates_root=src/main/resources/templates/
+```
+
+Note that we commnted the `spring.thymeleaf.prefix=/templates/` because we want to always read templates from filesystem.
+
+Now in a configuration class such as main application do:
+
+```java
+    @Autowired
+    private ThymeleafProperties properties;
+
+    @Value("${spring.thymeleaf.templates_root:}")
+    private String templatesRoot;
+    @Bean
+    public ITemplateResolver defaultTemplateResolver() {
+        FileTemplateResolver resolver = new FileTemplateResolver();
+        resolver.setSuffix(properties.getSuffix());
+        resolver.setPrefix(templatesRoot);
+        resolver.setTemplateMode(properties.getMode());
+        resolver.setCacheable(properties.isCache());
+        return resolver;
+    }
+```
