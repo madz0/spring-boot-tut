@@ -97,3 +97,36 @@ Now in a configuration class such as main application do:
         return resolver;
     }
 ```
+
+## Enable internationalization and translated validation
+
+In a configuration do:
+
+```java
+@Bean(name = "messageSource")
+    public MessageSource messageSource() {
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename("classpath:messages");
+        messageSource.setFallbackToSystemLocale(false);
+        messageSource.setCacheSeconds(0);
+        messageSource.setDefaultEncoding("UTF-8");
+        return messageSource;
+    }
+
+    @Bean
+    public LocalValidatorFactoryBean validator() {
+        LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
+        bean.setValidationMessageSource(messageSource());
+        return bean;
+    }
+
+    @Bean
+    public LocaleResolver localeResolver() {
+        CookieLocaleResolver lr = new CookieLocaleResolver();
+        lr.setDefaultLocale(DEFAULT_LOCALE);
+        return lr;
+    }
+    ```
+    
+    Then create translation files inside `resources` using `messages_lang.properties` convention
+    For validations put codes inside brackets
