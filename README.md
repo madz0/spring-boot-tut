@@ -127,6 +127,34 @@ In a configuration do:
         return lr;
     }
     ```
-    
-    Then create translation files inside `resources` using `messages_lang.properties` convention
-    For validations put codes inside brackets
+ 
+Then create translation files inside `resources` using `messages_lang.properties` convention
+For validations put codes inside brackets
+ 
+## Configurations and Starters design for better testing tip
+To make the software testable with faster tests, *devide configuaraion and starter components into smaller classes*. 
+ 
+In integration testing, `@SpringBootTest` is going to bring every thing up. So it makes testing so slow. 
+Everything is devided into the following parts:
+ 
+Web layer, Data layer, Application Context layer
+ 
+Both the web and data needs application context.
+When we use @SpringBootTest, it brings up all the three layers and it also brings up all the components for application context and this is the main reason why the tests are so slow in larger applications.
+
+To make it better, we should act differently for each test or at least have different base classes for different tests. But before going any further, lets see how can we elliminate the @SpringBootTest
+
+If we are going to test a controller, we only need the web layer and all application context for some limited components.
+So we use `@WebMvcTest` or its equivallent in reactive `@WebFluxTest`:
+```java
+@RunWith(SpringRunner.class)
+@WebMvcTest(EmployeeRestController.class)
+public class EmployeeRestControllerIntegrationTest{
+//test method
+}
+```
+Then we can use `@MockBean` to mock service layers. In an application with lots of bean deffinition, this would dramatically increase the run speed.
+
+For testing the sevice layer itself, I don't think we need any integration test, so simply can use `@MockBean` but `@MockBean` needs application context.
+To elliminate that, we can use of `@TestConfiguration`
+
