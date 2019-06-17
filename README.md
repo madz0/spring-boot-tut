@@ -103,7 +103,7 @@ Now in a configuration class such as main application do:
 In a configuration do:
 
 ```java
-@Bean(name = "messageSource")
+    @Bean(name = "messageSource")
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:messages");
@@ -126,7 +126,7 @@ In a configuration do:
         lr.setDefaultLocale(DEFAULT_LOCALE);
         return lr;
     }
-    ```
+```
  
 Then create translation files inside `resources` using `messages_lang.properties` convention
 For validations put codes inside brackets
@@ -156,5 +156,59 @@ public class EmployeeRestControllerIntegrationTest{
 Then we can use `@MockBean` to mock service layers. In an application with lots of bean deffinition, this would dramatically increase the run speed.
 
 For testing the sevice layer itself, I don't think we need any integration test, so simply can use `@MockBean` but `@MockBean` needs application context.
-To elliminate that, we can use of `@TestConfiguration`
+To elliminate that, we can use of `@TestConfiguration` as a inner static class inside the test:
+```java
+@RunWith(SpringRunner.class)
+public class EmployeeServiceImplIntegrationTest {
+ 
+    @TestConfiguration
+    static class EmployeeServiceImplTestContextConfiguration {
+  
+        @Bean
+        public EmployeeService employeeService() {
+            return new EmployeeServiceImpl();
+        }
+    }
+    
+    //use @Before
+ 
+    @Autowired
+    private EmployeeService employeeService;
+ 
+    @MockBean
+    private EmployeeRepository employeeRepository;
+ 
+    // write test cases here
+}
+```
+This way we don't need to bring up application context
+*During component scanning, we might find components or configurations created only for specific tests accidentally get picked up everywhere. To help prevent that, Spring Boot provides @TestConfiguration annotation that can be used on classes in src/test/java to indicate that they should not be picked up by scanning.*
 
+If we intended to test the data layer, we can use `@DataJpaTest` 
+
+```java
+@RunWith(SpringRunner.class)
+@DataJpaTest
+public class EmployeeRepositoryIntegrationTest {
+ 
+    @Autowired
+    private TestEntityManager entityManager;
+ 
+    @Autowired
+    private EmployeeRepository employeeRepository;
+ 
+    // write test cases here
+}
+```
+`@RunWith(SpringRunner.class)` is used to provide a bridge between Spring Boot test features and JUnit. Whenever we are using any Spring Boot testing features in out JUnit tests, this annotation will be required.
+
+`@DataJpaTest` provides some standard setup needed for testing the persistence layer:
+
+* configuring `H2`, an in-memory database
+* setting `Hibernate`, `Spring Data`, and the `DataSource`
+* performing an `@EntityScan`
+* turning on `SQL` logging
+
+To carry out some DB operation, we need some records already setup in our database. To setup such data, we can use TestEntityManager. The `TestEntityManager` provided by Spring Boot is an alternative to the standard `JPA EntityManager` that provides methods commonly used when writing tests.
+
+[spring-boot-testing](https://www.baeldung.com/spring-boot-testing)
