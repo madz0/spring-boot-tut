@@ -212,3 +212,62 @@ public class EmployeeRepositoryIntegrationTest {
 To carry out some DB operation, we need some records already setup in our database. To setup such data, we can use TestEntityManager. The `TestEntityManager` provided by Spring Boot is an alternative to the standard `JPA EntityManager` that provides methods commonly used when writing tests.
 
 [spring-boot-testing](https://www.baeldung.com/spring-boot-testing)
+
+As an example consider that we are going to do an integration test that uses a bean to do something. for this test, we only need to utilize autowired feature so we need only to bring up context and don't need web layer or data layer.
+If we use @SpringBootTest, it would bring up every thing. So we are going to use `@ContextConfiguration(classes = .{..})`
+But here, the classes is so important. If we use the main application class, again it would bring up so many beans because of the @SpringBootApplication (ComponentScan will be executed). 
+So to bring the smallest bean possible, we only put the direct Bean class and its dependencies in `classes` parameter.
+
+In the following example:
+
+```java
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = {MibRepositoryCached.class, MibbleMibCompiler.class, PathMatchingResourcePatternResolver.class})
+@TestPropertySource(locations = "classpath:application.properties")
+public class ExampleTest {
+    @Autowired
+    IMibRepository mibRepository;
+    @Autowired
+    ApplicationContext context;
+
+    @Before
+    public void init() throws BadArgumentException {
+        MainApplication coreApplication = new MainApplication();
+        coreApplication.setApplicationContext(context);
+    }
+
+    @Test
+    public void test() {
+    }
+}
+```
+
+here we've bring the `MibRepositoryCached` class that is an implementation of IMibRepository. This way the context would create that bean and autowired will work. But `MibRepositoryCached` has other dependencies to other beans called `MibbleMibCompiler` and `PathMatchingResourcePatternResolver` which make `MibRepositoryCached` failed. So we bring them too.
+
+The other autowired here is the `ApplicationContext` which is going to be created and injected by @ContextConfiguration.
+The reason to do that is because the main application is implemented `ApplicationContextAware` and defined as following:
+
+```java
+@Slf4j
+@SpringBootApplication
+@EnableScheduling
+@EnableCaching
+@EnableJpaRepositories(repositoryFactoryBeanClass = EntityGraphJpaRepositoryFactoryBean.class)
+public class MainApplication implements ApplicationContextAware {
+	private static ApplicationContext context;
+	public static void main(String[] args) {
+        SpringApplication.run(MainApplication.class, args);
+    }
+    
+    @Override
+    public ApplicationContext getApplicationContext() {
+        return context;
+    }
+    
+    public static <T> T getBean(Class<T> clazz) {
+        return context.getBean(clazz);
+    }
+}
+```
+
+We use `MainApplication.getBean()` in a places related to this test but since we don't bring up MainApplication, context is not be assigned. So we use @Before to set the context ourselves. This way the code is much much faster
