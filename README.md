@@ -292,3 +292,4 @@ and use something like this:
 ```java
 @Query(nativeQuery = true, name = "findAllDataMapping")
 ```
+Or we can use `Tuple` data type
