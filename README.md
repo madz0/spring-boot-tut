@@ -271,3 +271,24 @@ public class MainApplication implements ApplicationContextAware {
 ```
 
 We use `MainApplication.getBean()` in a places related to this test but since we don't bring up MainApplication, context is not be assigned. So we use @Before to set the context ourselves. This way the code is much much faster
+
+## Map native query result to entity and dto objects
+
+If the returned columns of the native query maches target entity, it implicitely converts it to entity
+Otherwise, define the mapping on top of the entity class using
+
+```java
+@SqlResultSetMapping(
+  name="EmployeeResult",
+  entities={
+    @EntityResult(
+      entityClass = Employee.class,
+        fields={
+          @FieldResult(name="id",column="employeeNumber"),
+          @FieldResult(name="name", column="name")})})
+@NamedNativeQuery(name = "findAllDataMapping", resultClass = Employee.class, resultSetMapping ="findAllDataMapping" query = "sql")
+```
+and use something like this:
+```java
+@Query(nativeQuery = true, name = "findAllDataMapping")
+```
