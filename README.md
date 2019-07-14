@@ -316,11 +316,25 @@ Or we can use `Tuple` data type
 	when running `someMethodInTransaction` `okMethod` wold do its job event if `notOkMethod` throws `Exception`
 
 2. In the followong example, 
-```java
-@Transactional
-public void changeName(long id, String name) {
- User user = userRepository.getById(id);
- user.setName(name);
- userRepository.save(user);
-}
-```
+	```java
+	@Transactional
+	public void changeName(long id, String name) {
+	 User user = userRepository.getById(id);
+	 user.setName(name);
+	 userRepository.save(user);
+	}
+	```
+	Either `@Transactional` or `userRepository.save(user)` is redundant. Because in a transactional scope every change to manage objects will be presisted at the end of transaction scope. Also the following use is wrong:
+	```java
+	@Transactional
+	public void changeName(long id, String name) {
+	  User user = userRepository.getById(id);
+	  user.setName(name);
+
+	  if (StringUtils.isNotEmpty(name)) {
+	    userRepository.save(user);
+	  }
+	}
+	```
+	`user.setName(name)` should go inside the validation check of event better its better to check validation befor transaction scope
+	
