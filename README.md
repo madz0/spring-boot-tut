@@ -293,3 +293,34 @@ and use something like this:
 @Query(nativeQuery = true, name = "findAllDataMapping")
 ```
 Or we can use `Tuple` data type
+
+## Spring tarnsactional
+
+1. Spring `@Transactional` only rollbacks for unchecked exception. So in the following example:
+
+	```java
+	@Transactional
+	public void someMethodInTransaction() {
+		okMethod();
+		notOkMethod()
+	}
+
+	void okMethod() {
+	//some work
+	}
+
+	void notOkMethod() throws Exception {
+		throw new Exception();	
+	}
+
+	when running `someMethodInTransaction` `okMethod` wold do its job event if `notOkMethod` throws `Exception`
+
+2. In the followong example, 
+```java
+@Transactional
+public void changeName(long id, String name) {
+ User user = userRepository.getById(id);
+ user.setName(name);
+ userRepository.save(user);
+}
+```
