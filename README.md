@@ -312,7 +312,7 @@ Or we can use `Tuple` data type
 	void notOkMethod() throws Exception {
 		throw new Exception();	
 	}
-
+	```
 	when running `someMethodInTransaction` `okMethod` wold do its job event if `notOkMethod` throws `Exception`
 
 2. In the followong example, 
@@ -337,4 +337,7 @@ Or we can use `Tuple` data type
 	}
 	```
 	`user.setName(name)` should go inside the validation check of event better its better to check validation befor transaction scope
-	
+
+3. An important thing to remember is that readOnly hint will be applied only when the corresponding @Transactionalcauses starting a completely new transaction.
+
+4. Any change made within a transaction to an entity (retrieved within the same transaction) will automatically be populated to the database at the end of the transaction, without the need of explicit manual updates.
