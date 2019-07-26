@@ -341,3 +341,7 @@ Or we can use `Tuple` data type
 3. An important thing to remember is that readOnly hint will be applied only when the corresponding @Transactionalcauses starting a completely new transaction.
 
 4. Any change made within a transaction to an entity (retrieved within the same transaction) will automatically be populated to the database at the end of the transaction, without the need of explicit manual updates.
+
+## Getting `DataIntegrationException` when using `@JoinColumn` with foreign key definition
+
+Sometimes you get `DataIntegrationException` when using `@JoinColumn` with foreign key definition and when you remove joincolumn, everything works. In that case, there is something wrong about data types in both sides. For example the referenced column may be a datetime(6) but refencing column is a datetime(20)
