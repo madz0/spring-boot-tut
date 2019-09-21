@@ -474,3 +474,7 @@ reference [http://www.laliluna.de/jpa-hibernate-guide/ch10.html](http://www.lali
 ## Cascading consists in propagating the Parent entity state transition to one or more Child entities, and it can be used for both unidirectional and bidirectional associations.
 
 ## Try not to use CascadeType especially remove for @ManyToMany association
+
+## Great article about @OneToMany mapping
+
+[https://vladmihalcea.com/the-best-way-to-map-a-onetomany-association-with-jpa-and-hibernate/](https://vladmihalcea.com/the-best-way-to-map-a-onetomany-association-with-jpa-and-hibernate/)
