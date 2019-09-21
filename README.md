@@ -472,3 +472,5 @@ image.getImageAsBlob2().length()
 reference [http://www.laliluna.de/jpa-hibernate-guide/ch10.html](http://www.laliluna.de/jpa-hibernate-guide/ch10.html)
 
 ## Cascading consists in propagating the Parent entity state transition to one or more Child entities, and it can be used for both unidirectional and bidirectional associations.
+
+## Try not to use CascadeType especially remove for @ManyToMany association
