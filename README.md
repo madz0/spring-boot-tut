@@ -345,3 +345,128 @@ Or we can use `Tuple` data type
 ## Getting `DataIntegrationException` when using `@JoinColumn` with foreign key definition
 
 Sometimes you get `DataIntegrationException` when using `@JoinColumn` with foreign key definition and when you remove joincolumn, everything works. In that case, there is something wrong about data types in both sides. For example the referenced column may be a datetime(6) but refencing column is a datetime(20)
+
+## @Lob in postgresql explanation
+
+A lob is a large object. Lob columns can be used to store very long texts or binary files. There are two kind of lobs: CLOB and BLOB. The first one is a character lob and can be used to store texts. It is an alternative to varchar, which is limited in most databases. The second is a binary lob and can be used to store binary files.
+
+A character lob is very simple, if you use PostgreSQL. In the table it is represented as text and can take any size of characters:
+
+```sql
+CREATE TABLE annotation.document
+(
+  largeText text,
+  ...
+```
+
+The class has a simple String field:
+```java
+private String text;
+```
+
+Annotation mapping. 
+```java
+import javax.persistence.Entity;
+import javax.persistence.Lob;
+..... snip ......
+@Entity
+public class Document implements Serializable {
+...... snip .......
+   @Lob
+   private String text;
+```
+
+Just add a @Lob annotation to a string field. That’s all
+
+### Binary lob (blob)
+
+There are two options to store blobs in PostgreSQL. The first approach stores the file directly in the column. The type of such a column is bytea, which is a short form of byte array. The second approach is to store a OID in the column which references a file. PostgreSQL keeps the file separately from your table. This type of such a column is blob or binary object. You can store large blobs in both column types. The simpler way is to use bytea, but PostgreSQL needs a lot of memory, if you use the bytea column PostgreSQL and select a lot of \ rows having large bytea columns. Columns of type blob or binaryobject can read the lob as stream, once you access the data. The disadvantage of blob/binaryobject is that if you delete a table row the file is not deleted automatically. The following examples will show a work around for this problem. So you may freely select any of this approaches.
+
+The PostgreSQL table is having a bytea and a blob column.
+```sql
+CREATE TABLE annotation.image
+(
+  imageasblob oid,
+  imageasbytea bytea,
+......
+```
+
+The bytea approach needs a byte array field in the class. I used imageasBytea[] Annotation mapping: It is important that you specify the type. You will get a blob column, if you don’t.
+
+```java
+import javax.persistence.Entity;
+import org.hibernate.annotations.Type;
+...... snip ......
+@Entity
+public class Image implements Serializable {
+
+   @Type(type = "org.hibernate.type.BinaryType")
+   private byte imageAsBytea[];
+........
+```
+Samples of use. 
+```java
+/* create a byte array and set it */
+byte byteArray[] = new byte[10000000];
+for (int i = 0; i < byteArray.length; i++) {
+   byteArray[i] = '1';
+}
+Image image = new Image();
+image.setImageAsBytea(byteArray);
+/* write a field to a file */
+FileOutputStream outputStream =
+   new FileOutputStream(new File("image_file_bytea"));
+outputStream.write(image.getImageAsBytea());
+```
+
+The blob approach requires some additional code. If we delete or update a blob image, the large object will not be deleted as well. Therefore we add a rule to the database, which will provide this for us. Hibernate will not see any of this code, but can simply rely on the fact that, if it deletes an entry. the lob will be deleted as well. Tip: The large object file will not be deleted automatically, if you use a blob column. In the psql client or pgadmin issue the following two statements. They will create rules. The first rule is called when a row is deleted. It deletes the corresponding lob. The second rule is called, when a row is updated. It deletes the old image, if the image has changed.
+```sql
+CREATE RULE droppicture AS ON DELETE TO annotation.image
+  DO SELECT lo_unlink( OLD.imageasblob );
+CREATE RULE reppicture AS ON UPDATE TO annotation.image
+  DO SELECT lo_unlink( OLD.imageasblob )
+   where OLD.imageasblob <> NEW.imageasblob;
+```
+We have two options in the class: a java.sql.Blob field and a byte array. We can use a byte array to map a lob to a blob column as well.
+
+Annotation mapping. 
+```java
+import java.sql.Blob;
+import javax.persistence.Entity;
+import javax.persistence.Lob;
+...... snip .........
+import org.hibernate.annotations.Type;
+import org.hibernate.type.BlobType;@Entity
+public class Image implements Serializable {
+   @Lob
+   private byte imageAsBlob[];
+   private Blob imageAsBlob2;
+```
+Samples of use. 
+
+```java
+/* creating a blob */
+byte byteArray[] = new byte[10000000];
+for (int i = 0; i < byteArray.length; i++) {
+   byteArray[i] = '1';
+}
+Image image = new Image();
+image.setImageAsBlob(byteArray);  // a blob as byte array
+image.setImageAsBlob2(Hibernate.createBlob(byteArray)); // a blob as blob
+/* reading */
+// read blob from a byte array is as simple as from a bytea
+FileOutputStream outputStream =
+   new FileOutputStream(new File("image_file_blob_array"));
+outputStream.write(image.getImageAsBlob());
+outputStream.close();
+// reading of a blob from a blob is in fact a inputstream
+outputStream = new FileOutputStream(new File("image_file_blob_blob"));
+outputStream.write(image.getImageAsBlob2()
+   .getBytes(1,(int)image.getImageAsBlob2().length()));
+outputStream.close();
+```
+Tip: You can only access the length field if your transaction is open.
+```java
+image.getImageAsBlob2().length()
+```
+reference [http://www.laliluna.de/jpa-hibernate-guide/ch10.html](http://www.laliluna.de/jpa-hibernate-guide/ch10.html)
