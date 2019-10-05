@@ -340,7 +340,7 @@ Or we can use `Tuple` data type
 
 3. An important thing to remember is that readOnly hint will be applied only when the corresponding @Transactionalcauses starting a completely new transaction.
 
-4. Any change made within a transaction to an entity (retrieved within the same transaction) will automatically be populated to the database at the end of the transaction, without the need of explicit manual updates.
+4. Any change made within a transaction to an entity (retrieved within the same transaction) will automatically be populated to the database at the end of the sql first n rows with bigger valuestransaction, without the need of explicit manual updates.
 
 ## Getting `DataIntegrationException` when using `@JoinColumn` with foreign key definition
 
@@ -484,3 +484,4 @@ reference [http://www.laliluna.de/jpa-hibernate-guide/ch10.html](http://www.lali
 
 ## Cautions to consider when mapping multiple entities to the same table 
 [https://thoughts-on-java.org/hibernate-tips-map-multiple-entities-same-table/](https://thoughts-on-java.org/hibernate-tips-map-multiple-entities-same-table/)
+### We can map an entity with `@Immutable` annotation this way hibernate does not use it update table (a proper way to map a view) 
