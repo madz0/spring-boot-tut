@@ -380,7 +380,7 @@ Just add a @Lob annotation to a string field. That’s all
 
 ### Binary lob (blob)
 
-There are two options to store blobs in PostgreSQL. The first approach stores the file directly in the column. The type of such a column is bytea, which is a short form of byte array. The second approach is to store a OID in the column which references a file. PostgreSQL keeps the file separately from your table. This type of such a column is blob or binary object. You can store large blobs in both column types. The simpler way is to use bytea, but PostgreSQL needs a lot of memory, if you use the bytea column PostgreSQL and select a lot of \ rows having large bytea columns. Columns of type blob or binaryobject can read the lob as stream, once you access the data. The disadvantage of blob/binaryobject is that if you delete a table row the file is not deleted automatically. The following examples will show a work around for this problem. So you may freely select any of this approaches.
+There are two options to store blobs in PostgreSQL. The first approach stores the file directly in the column. The type of such a column is bytea, which is a short form of byte array. The second approach is to store a OID in the column which references a file. PostgreSQL keeps the file separately from your table. This type of such a column is blob or binary object. You can store large blobs in both column types. The simpler way is to use bytea, but PostgreSQL needs a lot of memory, if you use the bytea column PostgreSQL and select a lot of rows having large bytea columns. Columns of type blob or binaryobject can read the lob as stream, once you access the data. The disadvantage of blob/binaryobject is that if you delete a table row the file is not deleted automatically. The following examples will show a work around for this problem. So you may freely select any of this approaches.
 
 The PostgreSQL table is having a bytea and a blob column.
 ```sql
@@ -404,6 +404,8 @@ public class Image implements Serializable {
    private byte imageAsBytea[];
 ........
 ```
+If your field is of type byte[] you don’t have to specify a type. We added it optionally. There should be not @Lob for the field to be saved as bytea.
+
 Samples of use. 
 ```java
 /* create a byte array and set it */
@@ -469,6 +471,7 @@ Tip: You can only access the length field if your transaction is open.
 ```java
 image.getImageAsBlob2().length()
 ```
+Tip: 
 reference [http://www.laliluna.de/jpa-hibernate-guide/ch10.html](http://www.laliluna.de/jpa-hibernate-guide/ch10.html)
 
 ## Cascading consists in propagating the Parent entity state transition to one or more Child entities, and it can be used for both unidirectional and bidirectional associations.
