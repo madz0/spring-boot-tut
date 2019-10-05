@@ -481,3 +481,6 @@ reference [http://www.laliluna.de/jpa-hibernate-guide/ch10.html](http://www.lali
 ## Great article about @OneToMany mapping
 
 [https://vladmihalcea.com/the-best-way-to-map-a-onetomany-association-with-jpa-and-hibernate/](https://vladmihalcea.com/the-best-way-to-map-a-onetomany-association-with-jpa-and-hibernate/)
+
+## Cautions to consider when mapping multiple entities to the same table 
+[https://thoughts-on-java.org/hibernate-tips-map-multiple-entities-same-table/](https://thoughts-on-java.org/hibernate-tips-map-multiple-entities-same-table/)
