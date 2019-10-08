@@ -485,3 +485,24 @@ reference [http://www.laliluna.de/jpa-hibernate-guide/ch10.html](http://www.lali
 ## Cautions to consider when mapping multiple entities to the same table 
 [https://thoughts-on-java.org/hibernate-tips-map-multiple-entities-same-table/](https://thoughts-on-java.org/hibernate-tips-map-multiple-entities-same-table/)
 ### We can map an entity with `@Immutable` annotation this way hibernate does not use it update table (a proper way to map a view) 
+
+## In the case of assigned identity for jpa, spring save uses following code:
+
+```java
+@Transactional
+public <S extends T> S save(S entity) {
+ 
+    if (entityInformation.isNew(entity)) {
+        em.persist(entity);
+        return entity;
+    } else {
+        return em.merge(entity);
+    }
+}
+```
+So if we assign value to id, merge will be executed. merge always issue a select to database. If it does not find any record, executes an insert.
+To prevent this, we can use a @Version property and assign null to it. This way merge will not execute a select before insert.
+
+## Best way to have a compound identity generator and assigned id in hibernate (https://vladmihalcea.com/how-to-combine-the-hibernate-assigned-generator-with-a-sequence-or-an-identity-column/)[https://vladmihalcea.com/how-to-combine-the-hibernate-assigned-generator-with-a-sequence-or-an-identity-column/]
+
+
