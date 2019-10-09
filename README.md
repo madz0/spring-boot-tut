@@ -538,7 +538,7 @@ First a `sqlTypeDescriptor` and then the corresponding `javaTypeDescriptor`
 The java type descriptor extends `AbstractTypeDescriptor` and `sqlTypeDescriptor` implements `SqlTypeDescriptor`.
 
 `SqlTypeDescriptor` has a `getSqlType()` method which we use to return the supported sql type by hibernate. This method does the `registerColumnType` method we used in `dialect` for the previous method. 
-Then we just need to register extended `AbstractSingleColumnStandardBasicType` using `@TypeDef` just like we did in the first way.
+Then we just need to register extended `AbstractSingleColumnStandardBasicType` using `@TypeDef` just like we did in the first way.varchar(2147483647)
 
 Using above information, I created a package-info file in the methods package and put the following contents in there:
 ```java
@@ -558,4 +558,4 @@ package com.ourproject.model;
 
 import org.hibernate.type.TextType;
 ```
-Now when we run maven test hibernate generates `text` column types for the jsonb type and it solved. 
+Now when we run maven test hibernate generates `varchar(2147483647)` column type for the jsonb type and it solved. 
