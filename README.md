@@ -505,4 +505,57 @@ To prevent this, we can use a @Version property and assign null to it. This way 
 
 ## Best way to have a compound identity generator and assigned id in hibernate (https://vladmihalcea.com/how-to-combine-the-hibernate-assigned-generator-with-a-sequence-or-an-identity-column/)[https://vladmihalcea.com/how-to-combine-the-hibernate-assigned-generator-with-a-sequence-or-an-identity-column/]
 
+## Define custom types for hibernate
 
+Recently in a project we needed to use postgresql jsonb type. We used a library called hibernate-types and it worked. 
+But all our test failed because H2 did not support jsonb. 
+The problem was that in our entity we used `@Column(columnDefinition="jsonb")` and hibernate tried creating a table with `jsonb` type.
+
+I needed a way to somehow alias the jsonb to text for the H2 database.
+First I came up with this code 
+```sql
+CREATE domain IF NOT EXISTS jsonb AS other;
+```
+I decided to run this query before hibernate creates the tables. To my surprise, i could not find a way to execute a sql code before hibernate generates database tables! 
+For example there were a way to create a `schema.sql` in `resources` and spring would execute them but it won't work a long side with hibernate `ddl-auto` other than `none` or `validate`.
+
+So I could not find out if that solution works or not.
+I decided to use custom types which maps `jsonb` to `jsonb` type in production and `text` type in tests.
+
+In `hibernate`, there are two ways to define a customtype. By implementing `UserType` interface or by extending a `AbstractSingleColumnStandardBasicType` class.
+`UserType` method is somehow strait forward. 
+We only need to implement its methods then register it in some place like a base entity or packa-info file using `@TypeDef` annotation.
+We also need to extend database `dialect` class and `registerColumnType` for the for the `jsonb`. 
+Then change database properties to use the extended `dielect`.
+
+There is a good sample explained in (https://thoughts-on-java.org/persist-postgresqls-jsonb-data-type-hibernate/)[https://thoughts-on-java.org/persist-postgresqls-jsonb-data-type-hibernate/]
+
+For the second way, we don't need to create new dialectic but we need to do a few other things.
+When extending `AbstractSingleColumnStandardBasicType`, there is a method called `getName()`.
+We need to override it and return the database column type we want to support. In this case `jsonb`.
+Its constructor takes two parameters. 
+First a `sqlTypeDescriptor` and then the corresponding `javaTypeDescriptor`
+The java type descriptor extends `AbstractTypeDescriptor` and `sqlTypeDescriptor` implements `SqlTypeDescriptor`.
+
+`SqlTypeDescriptor` has a `getSqlType()` method which we use to return the supported sql type by hibernate. This method does the `registerColumnType` method we used in `dialect` for the previous method. 
+Then we just need to register extended `AbstractSingleColumnStandardBasicType` using `@TypeDef` just like we did in the first way.
+
+Using above information, I created a package-info file in the methods package and put the following contents in there:
+```java
+@org.hibernate.annotations.TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+package com.ourproject.model;
+
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+```
+Then in the entity class, I removed `columnDefinition="jsonb"` from the `@Column` and only used `@Type(type = "jsonb")`
+
+This way, for the product hibernate would map column to `jsonb` type.
+Then in the test folder inside the same package I added `package-info` with this contents:
+
+```java
+@org.hibernate.annotations.TypeDef(name = "jsonb", typeClass = TextType.class)
+package com.ourproject.model;
+
+import org.hibernate.type.TextType;
+```
+Now when we run maven test hibernate generates `text` column types for the jsonb type and it solved. 
