@@ -538,18 +538,20 @@ First a `sqlTypeDescriptor` and then the corresponding `javaTypeDescriptor`
 The java type descriptor extends `AbstractTypeDescriptor` and `sqlTypeDescriptor` implements `SqlTypeDescriptor`.
 
 `SqlTypeDescriptor` has a `getSqlType()` method which we use to return the supported sql type by hibernate. This method does the `registerColumnType` method we used in `dialect` for the previous method. 
-Then we just need to register extended `AbstractSingleColumnStandardBasicType` using `@TypeDef` just like we did in the first way.varchar(2147483647)
+Then we just need to register extended `AbstractSingleColumnStandardBasicType` using `@TypeDef` just like we did in the first way.
 
-Using above information, I created a package-info file in the methods package and put the following contents in there:
+Using above information, I Created a package-info file in the models package and put the following contents in there:
 ```java
 @org.hibernate.annotations.TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 package com.ourproject.model;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 ```
+I used `JsonBinaryType` in `hibernate-types-52` library.
+
 Then in the entity class, I removed `columnDefinition="jsonb"` from the `@Column` and only used `@Type(type = "jsonb")`
 
-This way, for the product hibernate would map column to `jsonb` type.
+This way, for the product, hibernate would map column to `jsonb` type.
 Then in the test folder inside the same package I added `package-info` with this contents:
 
 ```java
