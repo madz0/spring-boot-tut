@@ -564,3 +564,5 @@ import org.hibernate.type.TextType;
 Now when we run maven test hibernate generates `varchar(2147483647)` column type for the jsonb type and it solved. 
 
 ## Clearing EntityManager drops all the unflushed changes so before calling clear we need to call flush
+
+## Threadpool size [https://jobs.zalando.com/tech/blog/how-to-set-an-ideal-thread-pool-size/?gh_src=4n3gxh1](https://jobs.zalando.com/tech/blog/how-to-set-an-ideal-thread-pool-size/?gh_src=4n3gxh1)
