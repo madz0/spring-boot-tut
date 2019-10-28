@@ -566,3 +566,5 @@ Now when we run maven test hibernate generates `varchar(2147483647)` column type
 ## Clearing EntityManager drops all the unflushed changes so before calling clear we need to call flush
 
 ## Threadpool size [https://jobs.zalando.com/tech/blog/how-to-set-an-ideal-thread-pool-size/?gh_src=4n3gxh1](https://jobs.zalando.com/tech/blog/how-to-set-an-ideal-thread-pool-size/?gh_src=4n3gxh1)
+
+## Good article about hibernate `HHH000179: Narrowing proxy to class` problem [https://marcin-chwedczuk.github.io/HHH000179-narrowing-proxy-to-class-this-operation-breaks-equality](https://marcin-chwedczuk.github.io/HHH000179-narrowing-proxy-to-class-this-operation-breaks-equality)
