@@ -568,3 +568,5 @@ Now when we run maven test hibernate generates `varchar(2147483647)` column type
 ## Threadpool size [https://jobs.zalando.com/tech/blog/how-to-set-an-ideal-thread-pool-size/?gh_src=4n3gxh1](https://jobs.zalando.com/tech/blog/how-to-set-an-ideal-thread-pool-size/?gh_src=4n3gxh1)
 
 ## Good article about hibernate `HHH000179: Narrowing proxy to class` problem [https://marcin-chwedczuk.github.io/HHH000179-narrowing-proxy-to-class-this-operation-breaks-equality](https://marcin-chwedczuk.github.io/HHH000179-narrowing-proxy-to-class-this-operation-breaks-equality)
+
+## [https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#reference](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#reference) Great reference for spring repository capabilities
