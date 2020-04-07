@@ -270,7 +270,20 @@ public class MainApplication implements ApplicationContextAware {
 }
 ```
 
-We use `MainApplication.getBean()` in a places related to this test but since we don't bring up MainApplication, context is not be assigned. So we use @Before to set the context ourselves. This way the code is much much faster
+We use `MainApplication.getBean()` in a places related to this test but since we don't bring up MainApplication, context is not be assigned. So we use @Before to set the context ourselves. This way the code is much much faster.
+
+Also if a bean has `@ConfigurationProperties(prefix = "some_prefix")` on it, then its properties wouldn't be automatically asigned using `@TestPropertySource` if we eliminate the `@SpringBootTest` in this case, we can simply use `@EnableConfigurationProperties(value = BeanWithConfigurationPropertiesOnIt.class)` on our test class.
+
+Also in
+```java
+@ContextConfiguration(classes = SomeConfigurationOrBean.class, initializers = ConfigFileApplicationContextInitializer.class)
+public class SomeServiceTest {}
+```
+`ConfigFileApplicationContextInitializer` alows the test class to pick standard application.properties or yaml configuration for test.
+
+and we can use `@Import(MyTestsConfiguration.class)` to import any classes with `@TestConfiguration` for any tests that needs it.
+
+ALso note that for junit5 tests, we need to use `@ExtendWith(SpringExtension.class)`
 
 ## Map native query result to entity and dto objects
 
