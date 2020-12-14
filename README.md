@@ -583,3 +583,5 @@ Now when we run maven test hibernate generates `varchar(2147483647)` column type
 ## Good article about hibernate `HHH000179: Narrowing proxy to class` problem [https://marcin-chwedczuk.github.io/HHH000179-narrowing-proxy-to-class-this-operation-breaks-equality](https://marcin-chwedczuk.github.io/HHH000179-narrowing-proxy-to-class-this-operation-breaks-equality)
 
 ## [https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#reference](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#reference) Great reference for spring repository capabilities
+
+## Spring boot doesn't merge application configuration with the same name! It only merges different profiles which is applicable for the run 
