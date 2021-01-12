@@ -135,6 +135,11 @@ For validations put codes inside brackets
 To make the software testable with faster tests, *devide configuaraion and starter components into smaller classes*. 
  
 In integration testing, `@SpringBootTest` is going to bring every thing up. So it makes testing so slow. 
+
+These good tutorials explain it in details and suggest a tool to detect slow tests:
+
+[https://reflectoring.io/spring-boot-test/](https://reflectoring.io/spring-boot-test) and [https://www.adesso.de/de/news/blog/identify-bottlenecks-in-your-spring-tests-with-junit-insights.jsp](https://www.adesso.de/de/news/blog/identify-bottlenecks-in-your-spring-tests-with-junit-insights.jsp)
+
 Everything is devided into the following parts:
  
 Web layer, Data layer, Application Context layer
