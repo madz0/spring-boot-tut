@@ -290,6 +290,37 @@ and we can use `@Import(MyTestsConfiguration.class)` to import any classes with 
 
 ALso note that for junit5 tests, we need to use `@ExtendWith(SpringExtension.class)`
 
+Below code
+```java
+@SpringBootTest(classes = HandlebarsProperties.class, properties = {
+    "handlebars.user-agent-cache-enabled=true",
+    "handlebars.user-agent-cache-size=2"})
+class HandlebarsPropertiesTest {
+
+    @Autowired
+    private HandlebarsProperties handlebarsProperties;
+}
+```
+and 
+```java
+@ExtendWith(SpringExtension.class)
+@EnableConfigurationProperties(value = HandlebarsProperties.class)
+@TestPropertySource(properties = {
+    "handlebars.user-agent-cache-enabled=true",
+    "handlebars.user-agent-cache-size=2")
+class HandlebarsPropertiesTest {
+
+    @Autowired
+    private HandlebarsProperties handlebarsProperties;
+}
+```
+are identical.
+
+If configured a custom scope for your beans, when running the integration tests might get error about the scope is not registered, in that case, make sure adding the related AutoConfiguration to the test class with:
+```java
+@ImportAutoConfiguration(ContextScopeAutoConfiguration.class)
+```
+
 ## Map native query result to entity and dto objects
 
 If the returned columns of the native query maches target entity, it implicitely converts it to entity
